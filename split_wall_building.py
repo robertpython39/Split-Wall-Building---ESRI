@@ -15,8 +15,8 @@ import arcpy
 import os
 
 def split_wall_bulding(gdbPath):
-
-    gdbPath = gdbPath.split()
+    env.workspace = gdbPath
+    env.overwriteOutput = True
     now = datetime.now()
     dt_string = now.strftime("%d/%m/%Y %H:%M:%S")
 
@@ -25,11 +25,8 @@ def split_wall_bulding(gdbPath):
 
     # check if extension ends with gdb or folder exists
     with open(os.path.join(os.getcwd(), "log.txt"), "w") as logFile:
-
-        if (os.path.isdir(gdbPath) and gdbPath.lower().endswith(".gdb")):
-            env.workspace = os.path.join(gdbPath, "ThematicData")
-            env.overwriteOutput = True
-            logFile.write("Workspace loaded -- {}".format(dt_string))
+        if gdbPath.endswith("gdb"):
+            logFile.write("Workspace loaded -- {}\n".format(dt_string))
             arcpy.FeatureVerticesToPoints_management(wall, "points_all", "ALL")
             logFile.write("Wall vertices to point ('ALL') created -- {}\n".format(dt_string))
             arcpy.FeatureVerticesToPoints_management(wall, "points_end", "BOTH_ENDS")
@@ -52,6 +49,7 @@ def split_wall_bulding(gdbPath):
             arcpy.Rename_management("wall_temp", "wall", "FeatureClas")
             logFile.write("Renaming temp layer with name of original layer -- {}\n".format(dt_string))
             logFile.close()
+
         else:
             print "GDB path is invalid"
 
